@@ -1,11 +1,40 @@
 [app/ui]
 version = 9.3.1
-modtime = 1727148191.207858000
+modtime = 1727152236.859001000
 
 [app/launcher]
 version = 9.3.1
-modtime = 1727148191.209410000
+modtime = 1727152236.860010000
 
 [app/install/state]
 version = 9.3.1
 modtime = 1727148208.646137000
+
+[nav/default]
+version = 9.3.1
+modtime = 1727152012.671573000
+
+[app/package/check_for_updates]
+version = 9.3.1
+modtime = 1727152236.861343000
+
+[savedsearches/logs_monitoring_discover]
+access = read : [ * ], write : [ admin, power ]
+export = none
+owner = splunk
+version = 9.3.1
+modtime = 1727152565.338732000
+
+[savedsearches/logs_monitoring_monitor_]
+access = read : [ * ], write : [ admin, power ]
+export = none
+owner = splunk
+version = 9.3.1
+modtime = 1727153941.618563000
+
+[savedsearches/logs_monitoring]
+access = read : [ * ], write : [ admin, power ]
+export = none
+owner = splunk
+version = 9.3.1
+modtime = 1727154169.775237000

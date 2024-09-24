@@ -1,0 +1,2 @@
+index,sourcetype,monitoring,"last_time_indexed","threshold_minutes",status,priority
+main,"facebook_ad_search",false,1726724257,"-60m",red,medium
