@@ -1,0 +1,150 @@
+<form version="1.1" theme="dark">
+  <label>Logs Monitoring Status</label>
+  <fieldset submitButton="false">
+    <input type="dropdown" token="monitoring">
+      <label>Monitoring</label>
+      <choice value="true">True</choice>
+      <choice value="false">False</choice>
+      <default>true</default>
+    </input>
+    <input type="text" token="index">
+      <label>index</label>
+      <default>*</default>
+      <prefix>*</prefix>
+      <suffix>*</suffix>
+    </input>
+    <input type="dropdown" token="status">
+      <label>Status</label>
+      <choice value="*">Any</choice>
+      <choice value="red">Red</choice>
+      <choice value="green">Green</choice>
+      <default>*</default>
+    </input>
+    <input type="dropdown" token="priority">
+      <label>Priority</label>
+      <choice value="*">Any</choice>
+      <choice value="high">High</choice>
+      <choice value="medium">Medium</choice>
+      <choice value="low">Low</choice>
+      <default>*</default>
+      <prefix>"</prefix>
+      <suffix>"</suffix>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Total</title>
+      <single>
+        <search>
+          <query>| inputlookup    logs_monitoring_monitor.csv
+| lookup logs_monitoring_discover.csv  index  sourcetype OUTPUT last_time_indexed
+| eval threshold = relative_time(now(), threshold_minutes)
+| eval status = if((last_time_indexed &lt; threshold) OR (isnull(last_time_indexed)), "red", "green")
+
+| table index  sourcetype	last_time_indexed	monitoring threshold_minutes status priority
+| eval last_time=strftime(last_time_indexed, "%Y-%m-%d %H:%M:%S")
+| search monitoring=$monitoring$ index=$index$, status=$status$ priority=$priority$
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xcba700","0xcba700"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Status - Green</title>
+        <search>
+          <query>| inputlookup    logs_monitoring_monitor.csv
+| lookup logs_monitoring_discover.csv  index  sourcetype OUTPUT last_time_indexed
+| eval threshold = relative_time(now(), threshold_minutes)
+| eval status = if((last_time_indexed &lt; threshold) OR (isnull(last_time_indexed)), "red", "green")
+
+| table index  sourcetype	last_time_indexed	monitoring threshold_minutes status priority
+| eval last_time=strftime(last_time_indexed, "%Y-%m-%d %H:%M:%S")
+| search monitoring=$monitoring$ index=$index$, status=$status$ status="green" priority=$priority$
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0x53a051","0x118832"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+    <panel>
+      <single>
+        <title>Status - Red</title>
+        <search>
+          <query>| inputlookup    logs_monitoring_monitor.csv
+| lookup logs_monitoring_discover.csv  index  sourcetype OUTPUT last_time_indexed
+| eval threshold = relative_time(now(), threshold_minutes)
+| eval status = if((last_time_indexed &lt; threshold) OR (isnull(last_time_indexed)), "red", "green")
+
+| table index  sourcetype	last_time_indexed	monitoring threshold_minutes status priority
+| eval last_time=strftime(last_time_indexed, "%Y-%m-%d %H:%M:%S")
+| search monitoring=$monitoring$ index=$index$, status=$status$ status="red" priority=$priority$
+| stats count</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="colorMode">block</option>
+        <option name="drilldown">none</option>
+        <option name="rangeColors">["0xd41f1f","0xd41f1f"]</option>
+        <option name="rangeValues">[0]</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="useColors">1</option>
+      </single>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Logs Monitoring</title>
+      <table>
+        <search>
+          <query>| inputlookup    logs_monitoring_monitor.csv
+| lookup logs_monitoring_discover.csv  index  sourcetype OUTPUT last_time_indexed
+| eval threshold = relative_time(now(), threshold_minutes)
+| eval status = if((last_time_indexed &lt; threshold) OR (isnull(last_time_indexed)), "red", "green")
+
+| table index  sourcetype	last_time_indexed	monitoring threshold_minutes status priority
+| eval last_time=strftime(last_time_indexed, "%Y-%m-%d %H:%M:%S")
+| search monitoring=$monitoring$ index=$index$, status=$status$ priority=$priority$
+| sort by index</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="count">20</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+        <format type="color" field="status">
+          <colorPalette type="map">{"green":#118832,"red":#D41F1F}</colorPalette>
+        </format>
+        <format type="color" field="priority">
+          <colorPalette type="map">{"medium":#88527D,"high":#E3723A,"low":#65778A}</colorPalette>
+        </format>
+        <format type="color" field="monitoring">
+          <colorPalette type="map">{"true":#2EA39B,"false":#E3723A}</colorPalette>
+        </format>
+        <format type="color" field="index">
+          <colorPalette type="sharedList"></colorPalette>
+          <scale type="sharedCategory"></scale>
+        </format>
+      </table>
+    </panel>
+  </row>
+</form>
